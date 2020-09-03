@@ -1,0 +1,193 @@
+/*
+Copyright (c) 2020 nastys
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
+#include <savegen.h>
+#include <QFile>
+#include <configfile.h>
+
+namespace paramSfo
+{
+    void ParamSfo::addKey(QString key, QByteArray &data, DataType type)
+    {
+        this->keys.append(key);
+        this->data.append(data);
+        IndexTable tempTable;
+        tempTable.data_type=type;
+        this->indexTables.append(tempTable);
+
+        if(this->keys.count()>1&&this->keys.at(this->keys.count()-1).compare(this->keys.at(this->keys.count()-2))<0)
+        {
+            auto tmp1= this->keys.at(this->keys.count()-1);
+            this->keys[this->keys.count()-1] = this->keys.at(this->keys.count()-2);
+            this->keys[this->keys.count()-2] = tmp1;
+
+            auto tmp2 = this->data.at(this->data.count()-1);
+            this->data[this->data.count()-1] = this->data.at(this->data.count()-2);
+            this->data[this->data.count()-2] = tmp2;
+
+            auto tmp3 = this->indexTables.at(this->indexTables.count()-1);
+            this->indexTables[this->indexTables.count()-1] = this->indexTables.at(this->data.count()-2);
+            this->indexTables[this->indexTables.count()-2] = tmp3;
+        }
+
+        this->header.entry_count++;
+    }
+
+    void ParamSfo::exportSfo(QString filepath)
+    {
+        QFile file(filepath);
+        file.open(QIODevice::ReadWrite);
+        file.resize(0);
+
+        QByteArray keyArray, dataArray;
+        unsigned short nextOffset=0;
+        for(unsigned int i=0; i<header.entry_count; i++)
+        {
+            QByteArray str = keys.at(i).toUtf8();
+            if(str.at(str.count()-1)!='\0') str.append('\0');
+            keyArray.append(str);
+
+            indexTables[i].key_offset=nextOffset;
+            nextOffset+=str.size();
+
+            QByteArray dstr = data.at(i);
+            if(indexTables.at(i).data_type==DataType::utf8
+                    &&(dstr.count()==0||dstr.at(dstr.count()-1)!='\0'))
+                dstr.append('\0');
+            indexTables[i].data_size_used = dstr.size();
+            while(dstr.size()%4) dstr.append('\0');
+            indexTables[i].data_size_total = dstr.size();
+            dataArray.append(dstr);
+        }
+        while(keyArray.size()%4)
+        {
+            keyArray.append('\0');
+            nextOffset++;
+        }
+        header.data_table_offset=nextOffset;
+        nextOffset=0;
+        for(unsigned int i=0; i<header.entry_count; i++)
+        {
+            indexTables[i].data_offset=nextOffset;
+            nextOffset+=indexTables.at(i).data_size_total;
+        }
+
+        header.key_table_offset = sizeof(Header)+(sizeof(IndexTable)*indexTables.count());
+        header.data_table_offset = header.key_table_offset + keyArray.size();
+
+        file.write((char*)&header, sizeof(header));
+        for(int i=0; i<indexTables.size(); i++)
+            file.write((char*)&indexTables.at(i), sizeof(indexTables[i]));
+        file.write(keyArray);
+        file.write(dataArray);
+
+        file.close();
+    }
+
+    void ParamSfo::clear()
+    {
+        header.key_table_offset=0;
+        header.data_table_offset=0;
+        header.entry_count=0;
+        keys.clear();
+        data.clear();
+        indexTables.clear();
+    }
+
+    void generateEditSave(QString editNumber, QString &editName)
+    {
+        paramSfo::ParamSfo paramSfo;
+        QByteArray bytearray;
+
+        bytearray=QString("0000000000000000").toUtf8();
+        bytearray.resize(16);
+        paramSfo.addKey("ACCOUNT_ID", bytearray, paramSfo::DataType::utf8s);
+        bytearray.clear();
+
+        for(int i=0; i<4; i++) bytearray.append('\0');
+        paramSfo.addKey("ATTRIBUTE", bytearray, paramSfo::DataType::int32);
+        bytearray.clear();
+
+        bytearray=QString("SD").toUtf8(); // Save Data
+        paramSfo.addKey("CATEGORY", bytearray, paramSfo::DataType::utf8);
+        bytearray.clear();
+
+        bytearray=QString("Generated by UltraEdit").toUtf8();
+        paramSfo.addKey("DETAIL", bytearray, paramSfo::DataType::utf8);
+        bytearray.clear();
+
+        for(int i=0; i<1024; i++) bytearray.append('\0');
+        paramSfo.addKey("PARAMS", bytearray, paramSfo::DataType::utf8s);
+        bytearray.clear();
+
+        for(int i=0; i<12; i++) bytearray.append('\0');
+        paramSfo.addKey("PARAMS2", bytearray, paramSfo::DataType::utf8s);
+        bytearray.clear();
+
+        for(int i=0; i<4; i++) bytearray.append('\0');
+        paramSfo.addKey("PARENTAL_LEVEL", bytearray, paramSfo::DataType::int32);
+        bytearray.clear();
+
+        bytearray=QString(*configfile::keys::gameid+"-EDIT"+editNumber).toUtf8();
+        paramSfo.addKey("SAVEDATA_DIRECTORY", bytearray, paramSfo::DataType::utf8);
+        bytearray.clear();
+
+        bytearray=QString("").toUtf8();
+        paramSfo.addKey("SAVEDATA_LIST_PARAM", bytearray, paramSfo::DataType::utf8);
+        bytearray.clear();
+
+        bytearray=QString(editName).toUtf8();
+        paramSfo.addKey("SUB_TITLE", bytearray, paramSfo::DataType::utf8);
+        bytearray.clear();
+
+        bytearray=QString("UltraEdit"+*configfile::keys::dtmgr_titlebar).toUtf8();
+        paramSfo.addKey("TITLE", bytearray, paramSfo::DataType::utf8);
+        bytearray.clear();
+
+        const QString editSaveFolder = *configfile::keys::savedir+"/../"+*configfile::keys::gameid+"-EDIT"+editNumber;
+
+        QDir().mkdir(editSaveFolder);
+
+        paramSfo.exportSfo(editSaveFolder+"/PARAM.SFO");
+
+        QFile::copy(*configfile::keys::savedir+"/ICON0.PNG", editSaveFolder+"/ICON0.PNG");
+        QFile::copy(*configfile::keys::savedir+"/PIC1.PNG", editSaveFolder+"/PIC1.PNG");
+    }
+
+    void generateEditSave(int editNumber, QString &editName)
+    {
+        QString editNum=QStringLiteral("%1").arg(editNumber, 2, 10, QLatin1Char('0'));
+        generateEditSave(editNum, editName);
+    }
+
+    void deleteEditSave(QString editNumber)
+    {
+        QDir dir(*configfile::keys::savedir+"/../"+*configfile::keys::gameid+"-EDIT"+editNumber);
+        dir.removeRecursively();
+    }
+
+    void deleteEditSave(int editNumber)
+    {
+        QString editNum=QStringLiteral("%1").arg(editNumber, 2, 10, QLatin1Char('0'));
+        deleteEditSave(editNum);
+    }
+};

@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/shader/glsl/modulespr">
+        <file>2dtex.vert</file>
+        <file>ati2ycbcr.frag</file>
+        <file>rgba8.frag</file>
+    </qresource>
+</RCC>
