@@ -237,12 +237,14 @@ namespace convert
 
     int mdl_psp2_to_dt2(int psp_mdl, const unsigned char *tbl, int tblsize)
     {
+        if(psp_mdl==-1) return -1;
         if(psp_mdl>tblsize) return 0;
         return static_cast<int>(tbl[psp_mdl]);
     }
 
     int mdl_dt2_to_psp2(int dt2_mdl, const unsigned char *tbl, int tblsize)
     {
+        if(dt2_mdl==-1) return -1;
         for(int i=0; i<tblsize; i++)
         {
             if(tbl[i]==dt2_mdl) return i;
