@@ -54,6 +54,17 @@ namespace configfile
             inline long system_usrid_addr_dt3=0x54050;
         };
 
+#ifdef __APPLE__
+        namespace defaultdir
+        {
+            inline QString dd_rom_dt=QDir::homePath()+"/Library/Application Support/rpcs3/dev_hdd0/game/NPJB00047/USRDIR/rom/";
+            inline QString dd_rom_dt2=QDir::homePath()+"/Library/Application Support/rpcs3/dev_hdd0/game/NPJB00134/USRDIR/rom/";
+            inline QString dd_rom_dt3=QDir::homePath()+"/Library/Application Support/rpcs3/dev_hdd0/game/NPJB00201/USRDIR/rom/";
+            inline QString dd_save_dt=QDir::homePath()+"/Library/Application Support/rpcs3/dev_hdd0/home/00000001/savedata/NPJB00047-SYSTEM00/";
+            inline QString dd_save_dt2=QDir::homePath()+"/Library/Application Support/dev_hdd0/home/00000001/savedata/NPJB00134-SYSTEM00/";
+            inline QString dd_save_dt3=QDir::homePath()+"/Library/Application Support/dev_hdd0/home/00000001/savedata/NPJB00201-SYSTEM00/";
+        };
+#else
         namespace defaultdir
         {
             inline QString dd_rom_dt=QDir::homePath()+"/.config/rpcs3/dev_hdd0/game/NPJB00047/USRDIR/rom/";
@@ -63,6 +74,7 @@ namespace configfile
             inline QString dd_save_dt2=QDir::homePath()+"/.config/rpcs3/dev_hdd0/home/00000001/savedata/NPJB00134-SYSTEM00/";
             inline QString dd_save_dt3=QDir::homePath()+"/.config/rpcs3/dev_hdd0/home/00000001/savedata/NPJB00201-SYSTEM00/";
         };
+#endif
 
         namespace keydef
         {

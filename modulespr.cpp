@@ -24,6 +24,7 @@ SOFTWARE.
 #include <QDir>
 #include <QDataStream>
 #include <QVector>
+#include <QDebug>
 #include <qgzdec.h>
 #include <configfile.h>
 
@@ -96,7 +97,11 @@ namespace modulespr
     bool extractMipmaps(long long& lumapos, int& lumasize, long long& chromapos, int& chromasize, int& tex_w, int& tex_h, float& nrm_x, float& nrm_y, float& nrm_w, float& nrm_h, QByteArray &uncompressedData, int filenum)
     {
         QFile file(*configfile::keys::romdir+"/2d/spr_ps3_mdl"+QStringLiteral("%1").arg(filenum, 3, 10, QLatin1Char('0'))+".farc");
-        if(!file.open(QIODevice::ReadOnly)) return 1;
+		if(!file.open(QIODevice::ReadOnly))
+		{
+			qDebug() << "Couldn't open" << file.fileName();
+			return 1;
+		}
         QDataStream filestream(&file);
         filestream.setByteOrder(QDataStream::BigEndian);
 

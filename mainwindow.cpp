@@ -113,7 +113,7 @@ void MainWindow::on_pushButton_dtMgr_clicked()
 {
     if(configfile::keys::romdir->isEmpty()||!QDir().exists(*configfile::keys::romdir))
     {
-        QString romdir_dlg = folderCfgDlg(configfile::keys::dtmgr_titlebar, "rom", " (game/"+*configfile::keys::gameid+"/USRDIR/rom)", *configfile::keys::defaultdir_rom);
+        QString romdir_dlg = folderCfgDlg(configfile::keys::dtmgr_titlebar, "rom", " (game/"+*configfile::keys::gameid+"/USRDIR/rom)", *configfile::keys::defaultdir_rom, "pv_db.txt");
         if(romdir_dlg.isEmpty()) return;
         *configfile::keys::romdir=romdir_dlg;
         configfile::settings.setValue(*configfile::keys::romdir_key, romdir_dlg);
@@ -136,7 +136,7 @@ void MainWindow::on_pushButton_dtMgr_clicked()
             systemSaveFile.read(usrdir_id.data(), usrdir_id.size());
             systemSaveFile.close();
             const QString usrdir_id_str = QString::fromUtf8(usrdir_id);
-            const QString usrPath = *configfile::keys::romdir+"/../../../"+configfile::keys::gameid+"-DATA/USRDIR/"+usrdir_id_str+"/USER";
+			const QString usrPath = *configfile::keys::romdir+"/../../../"+*configfile::keys::gameid+"-DATA/USRDIR/"+usrdir_id_str+"/USER";
             for(int i=0; i<100; i++)
             {
                 const QString editNum=QStringLiteral("%1").arg(i, 8, 10, QLatin1Char('0'));

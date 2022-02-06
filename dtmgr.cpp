@@ -170,7 +170,12 @@ void dtMgr::on_listWidget_currentRowChanged(int currentRow)
             else if(i==pvdbparse::parsedSongList.length()-1)
             {
                 if(fileString.endsWith(".mp3"))
-                    ui->radioButton_MP3->setChecked(true);
+                {
+                    if(QFile::exists(*configfile::keys::romdir+"/../" + fileString))
+                        ui->radioButton_MP3_2->setChecked(true);
+                    else
+                        ui->radioButton_MP3->setChecked(true);
+                }
                 else if(fileString.endsWith(".ogg"))
                     ui->radioButton_Vorbis->setChecked(true);
                 else if(fileString.endsWith(".adx"))
@@ -298,7 +303,7 @@ void dtMgr::on_pushButton_apply_clicked()
 
         memset(entry1[i].audioFile, 0, sizeof(entry1[i].audioFile));
         memset(tmpentry.audioFile, 0, sizeof(tmpentry.audioFile));
-        if(ui->radioButton_MP3->isChecked())
+        if(ui->radioButton_MP3->isChecked() || ui->radioButton_MP3_2->isChecked())
         {
             const QString editNum=QStringLiteral("%1").arg(ui->listWidget->currentRow(), 2, 10, QLatin1Char('0'));
             QByteArray editmp3str="DATA/SONG_EDIT"+editNum.toLatin1()+".mp3";
@@ -371,7 +376,7 @@ void dtMgr::on_pushButton_apply_clicked()
 
         memset(entry2[i].audioFile, 0, sizeof(entry2[i].audioFile));
         memset(tmpentry.audioFile, 0, sizeof(tmpentry.audioFile));
-        if(ui->radioButton_MP3->isChecked())
+        if(ui->radioButton_MP3->isChecked() || ui->radioButton_MP3_2->isChecked())
         {
             const QString editNum=QStringLiteral("%1").arg(ui->listWidget->currentRow(), 2, 10, QLatin1Char('0'));
             QByteArray editmp3str="DATA/SONG_EDIT"+editNum.toLatin1()+".mp3";
@@ -581,9 +586,13 @@ void dtMgr::on_radioButton_MP3_clicked()
     if(!result.isEmpty())
     {
         const QString editNum=QStringLiteral("%1").arg(ui->listWidget->currentRow(), 2, 10, QLatin1Char('0'));
-        const QString filePath=*configfile::keys::romdir+"/../../../"+*configfile::keys::gameid+"-DATA/USRDIR/"+usrdir_id+"/USER"+QStringLiteral("%1").arg(*configfile::keys::user, 8, 10, QLatin1Char('0'))+"/DATA/SONG_EDIT"+editNum+".mp3";
+        const QString dstFolder=*configfile::keys::romdir+"/../../../"+*configfile::keys::gameid+"-DATA/USRDIR/"+usrdir_id+"/USER"+QStringLiteral("%1").arg(*configfile::keys::user, 8, 10, QLatin1Char('0'))+"/DATA/";
+        const QString filePath=dstFolder + "SONG_EDIT"+editNum+".mp3";
         songFileCleanup();
-        QFile::copy(result, filePath);
+        if(!QDir().mkpath(dstFolder) || !QFile::copy(result, filePath))
+        {
+            QMessageBox::warning(this, "Warning", "Couldn't copy \"" + result + "\" to \"" + filePath + "\".");
+        }
         on_pushButton_apply_clicked();
     }
     ui->widget_audiofile->setEnabled(1);
@@ -592,7 +601,9 @@ void dtMgr::on_radioButton_MP3_clicked()
 
 void dtMgr::on_pushButton_audio_preview_clicked()
 {
-    QDesktopServices::openUrl(getAudioPath());
+    const QString path = getAudioPath();
+    if(!QDesktopServices::openUrl(path))
+        QMessageBox::warning(this, "Warning", "Couldn't open \"" + path + "\".");
 }
 
 void dtMgr::on_radioButton_none_clicked()
@@ -603,7 +614,7 @@ void dtMgr::on_radioButton_none_clicked()
 
 void dtMgr::on_radioButton_Vorbis_clicked()
 {
-    installSongHack("Select Ogg Vorbis", "Ogg Vorbis (*.ogg *.oga);;Ogg Audio (*.ogg *.oga *.spx *.opus);;Ogg (*.ogg *.oga *.ogm *.ogx *.ogv *.spx *.opus");
+    installSongHack("Select Ogg Vorbis", "Ogg (*.ogg)");
 }
 
 void dtMgr::songFileCleanup()
@@ -614,6 +625,7 @@ void dtMgr::songFileCleanup()
     QFile::remove(filePath+"ogg");
     QFile::remove(filePath+"adx");
     QFile::remove(filePath+"aix");
+    QFile::remove(*configfile::keys::romdir+"/../DATA/SONG_EDIT"+editNum+".mp3");
     QFile::remove(*configfile::keys::romdir+"/../DATA/SONG_EDIT"+editNum+".ogg");
     QFile::remove(*configfile::keys::romdir+"/../DATA/SONG_EDIT"+editNum+".adx");
     QFile::remove(*configfile::keys::romdir+"/../DATA/SONG_EDIT"+editNum+".aix");
@@ -629,16 +641,21 @@ void dtMgr::installSongHack(QString dlgTitle, QString dlgFormat)
     QString result = QFileDialog::getOpenFileName(this, dlgTitle, "", dlgFormat);
     if(!result.isEmpty())
     {
-        const QString extension = result.right(4).toLower();
+        const QString extension = "." + result.split('.').last().toLower();
         const QString editNum=QStringLiteral("%1").arg(ui->listWidget->currentRow(), 2, 10, QLatin1Char('0'));
         const QString stubFilePath=*configfile::keys::romdir+"/../../../"+*configfile::keys::gameid+"-DATA/USRDIR/"+usrdir_id+"/USER"+QStringLiteral("%1").arg(*configfile::keys::user, 8, 10, QLatin1Char('0'))+"/DATA/SONG_EDIT"+editNum+extension;
-        const QString dataFilePath=*configfile::keys::romdir+"/../DATA/SONG_EDIT"+editNum+extension;
+        const QString dataFileFolder=*configfile::keys::romdir+"/../DATA/";
+        const QString dataFilePath=dataFileFolder + "SONG_EDIT"+editNum+extension;
         songFileCleanup();
         QFile stub(stubFilePath);
         stub.open(QIODevice::ReadWrite);
         stub.resize(0);
         stub.close();
         QFile::copy(result, dataFilePath);
+        if(!QDir().mkpath(dataFileFolder) || !QFile::copy(result, dataFilePath))
+        {
+            //QMessageBox::warning(this, "Warning", "Couldn't copy \"" + result + "\" to \"" + dataFilePath + "\".");
+        }
         on_pushButton_apply_clicked();
     }
     ui->widget_audiofile->setEnabled(1);
@@ -684,9 +701,16 @@ QString dtMgr::getAudioPath()
         QString extension;
         if(ui->radioButton_adx->isChecked()) extension=".adx";
         else if(ui->radioButton_aix->isChecked()) extension=".aix";
+        else if(ui->radioButton_MP3_2->isChecked()) extension=".mp3";
         else extension=".ogg";
         const QString editNum=QStringLiteral("%1").arg(ui->listWidget->currentRow(), 2, 10, QLatin1Char('0'));
         const QString stubFilePath=*configfile::keys::romdir+"/../../../"+*configfile::keys::gameid+"-DATA/USRDIR/"+usrdir_id+"/USER"+QStringLiteral("%1").arg(*configfile::keys::user, 8, 10, QLatin1Char('0'))+"/DATA/SONG_EDIT"+editNum+extension;
         return *configfile::keys::romdir+"/../DATA/SONG_EDIT"+editNum+extension;
     }
 }
+
+void dtMgr::on_radioButton_MP3_2_clicked()
+{
+    installSongHack("Select MP3", "MPEG-1/2/2.5 Audio Layer III (*.mp3)");
+}
+

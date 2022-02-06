@@ -6,7 +6,7 @@ Edit converter for 初音ミク: Project DIVA
 
 ## Requirements
 - 64-bit Ubuntu 20.04 or Linux Mint 20, or 64-bit Windows 7
-- OpenGL 3.0 GPU (or software renderer)
+- OpenGL 3.3 GPU (or software renderer)
 
 ## Known issues
 - The program may crash after setting up the directories for the first time. In this case, just restart it

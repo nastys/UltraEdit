@@ -1,5 +1,4 @@
-#version 130
-#extension GL_ARB_explicit_attrib_location : enable
+#version 330 core
 layout (location = 0) out vec4 FragColor;
 
 in vec2 UV;

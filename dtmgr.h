@@ -86,6 +86,8 @@ private slots:
 
     void on_pushButton_audio_export_clicked();
 
+	void on_radioButton_MP3_2_clicked();
+
 private:
     Ui::dtMgr *ui;
 

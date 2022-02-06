@@ -26,7 +26,7 @@ SOFTWARE.
 #include <QWidget>
 #include <QOpenGLWidget>
 #include <QByteArray>
-#include <QOpenGLFunctions_3_0>
+#include <QOpenGLFunctions_3_3_Core>
 #include <QOpenGLShaderProgram>
 
 class glmodule : public QOpenGLWidget
@@ -61,7 +61,7 @@ private:
     GLuint vao, vbo;
     QOpenGLShaderProgram program;
     GLuint tex0, tex1;
-    QOpenGLFunctions_3_0 *qgl;
+	QOpenGLFunctions_3_3_Core *qgl;
     QByteArray sprbindata;
     long long lumapos, chromapos;
 

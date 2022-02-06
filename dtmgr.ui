@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>890</width>
-    <height>550</height>
+    <width>952</width>
+    <height>571</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -309,77 +309,14 @@
          <string>Audio</string>
         </property>
         <layout class="QGridLayout" name="gridLayout">
-         <item row="8" column="0" colspan="3">
-          <widget class="QWidget" name="widget_4" native="true">
-           <layout class="QHBoxLayout" name="horizontalLayout_2">
-            <property name="leftMargin">
-             <number>0</number>
-            </property>
-            <property name="topMargin">
-             <number>0</number>
-            </property>
-            <property name="rightMargin">
-             <number>0</number>
-            </property>
-            <property name="bottomMargin">
-             <number>0</number>
-            </property>
-           </layout>
-          </widget>
-         </item>
-         <item row="3" column="0">
-          <widget class="QRadioButton" name="radioButton_adx">
-           <property name="text">
-            <string>ADX (hack)</string>
-           </property>
-          </widget>
-         </item>
-         <item row="5" column="0">
-          <widget class="QRadioButton" name="radioButton_builtin">
-           <property name="text">
-            <string>Built-in:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="0" colspan="3">
+         <item row="3" column="0" colspan="3">
           <widget class="QRadioButton" name="radioButton_Vorbis">
            <property name="text">
-            <string>Ogg Vorbis (hack; 48000 Hz only)</string>
+            <string>Ogg Vorbis (.ogg; hack; 48000 Hz only)</string>
            </property>
           </widget>
          </item>
-         <item row="5" column="1" colspan="2">
-          <widget class="QComboBox" name="comboBox_builtinSong">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="0">
-          <widget class="QRadioButton" name="radioButton_aix">
-           <property name="text">
-            <string>AIX (hack)</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0" colspan="3">
-          <widget class="QRadioButton" name="radioButton_MP3">
-           <property name="text">
-            <string>MPEG-1/2/2.5 Audio Layer III</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="0">
-          <widget class="QRadioButton" name="radioButton_none">
-           <property name="text">
-            <string>None</string>
-           </property>
-           <property name="checked">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="7" column="0" colspan="3">
+         <item row="8" column="0" colspan="3">
           <widget class="QWidget" name="widget_audiofile" native="true">
            <property name="enabled">
             <bool>false</bool>
@@ -412,6 +349,76 @@
              </widget>
             </item>
            </layout>
+          </widget>
+         </item>
+         <item row="6" column="1" colspan="2">
+          <widget class="QComboBox" name="comboBox_builtinSong">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="0">
+          <widget class="QRadioButton" name="radioButton_aix">
+           <property name="text">
+            <string>AIX (.aix; hack)</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0" colspan="3">
+          <widget class="QRadioButton" name="radioButton_MP3">
+           <property name="text">
+            <string>MPEG Audio Layer III (.mp3)</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="0">
+          <widget class="QRadioButton" name="radioButton_adx">
+           <property name="text">
+            <string>ADX (.adx; hack)</string>
+           </property>
+          </widget>
+         </item>
+         <item row="9" column="0" colspan="3">
+          <widget class="QWidget" name="widget_4" native="true">
+           <layout class="QHBoxLayout" name="horizontalLayout_2">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+           </layout>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QRadioButton" name="radioButton_none">
+           <property name="text">
+            <string>None</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="0">
+          <widget class="QRadioButton" name="radioButton_builtin">
+           <property name="text">
+            <string>Built-in:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0" colspan="3">
+          <widget class="QRadioButton" name="radioButton_MP3_2">
+           <property name="text">
+            <string>MPEG Audio Layer III (.mp3; hack/fallback)</string>
+           </property>
           </widget>
          </item>
         </layout>

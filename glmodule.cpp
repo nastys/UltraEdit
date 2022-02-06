@@ -42,10 +42,12 @@ glmodule::~glmodule()
 
 void glmodule::initializeGL()
 {
-    qgl = new QOpenGLFunctions_3_0;
+	qgl = new QOpenGLFunctions_3_3_Core;
     qgl->initializeOpenGLFunctions();
 
-    modulespr::extractMipmaps(lumapos, lumasize, chromapos, chromasize, tex_w, tex_h, nrm_x, nrm_y, nrm_w, nrm_h, sprbindata, 0);
+	if (modulespr::extractMipmaps(lumapos, lumasize, chromapos, chromasize, tex_w, tex_h, nrm_x, nrm_y, nrm_w, nrm_h, sprbindata, 0))
+		qDebug() << "Couldn't load module textures.";
+
     vertices[2]=vertices[6]=vertices[22]=nrm_x;
     vertices[7]=vertices[15]=vertices[23]=-nrm_y;
     vertices[10]=vertices[14]=vertices[18]=nrm_w;
@@ -73,7 +75,7 @@ void glmodule::initializeGL()
         qgl->glCompressedTexImage2D(GL_TEXTURE_2D, 0, GL_COMPRESSED_RG_RGTC2, tex_w/2, tex_h/2, 0, chromasize, sprbindata.data()+chromapos);
 
         int texture1Location =  program.uniformLocation("Texture1");
-        qgl->glUniform1i(texture1Location, 1);
+		qgl->glUniform1i(texture1Location, 1);
     }
     else
     {
@@ -81,11 +83,11 @@ void glmodule::initializeGL()
         program.link();
         program.bind();
 
-        qgl->glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, tex_w, tex_h, 0, GL_RGBA, GL_UNSIGNED_BYTE, sprbindata.data()+lumapos);
+		qgl->glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, tex_w, tex_h, 0, GL_RGBA, GL_UNSIGNED_BYTE, sprbindata.data()+lumapos);
     }
 
     int texture0Location = program.uniformLocation("Texture0");
-    qgl->glUniform1i(texture0Location, 0);
+	qgl->glUniform1i(texture0Location, 0);
 
     qgl->glGenVertexArrays(1, &vao);
     qgl->glGenBuffers(1, &vbo);
@@ -108,10 +110,10 @@ void glmodule::paintGL()
 {
     qgl->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     qgl->glBindVertexArray(vao);
-    qgl->glActiveTexture(GL_TEXTURE0);
-    qgl->glBindTexture(GL_TEXTURE_2D, tex0);
-    qgl->glActiveTexture(GL_TEXTURE1);
-    qgl->glBindTexture(GL_TEXTURE_2D, tex1);
+	qgl->glActiveTexture(GL_TEXTURE0);
+	qgl->glBindTexture(GL_TEXTURE_2D, tex0);
+	qgl->glActiveTexture(GL_TEXTURE1);
+	qgl->glBindTexture(GL_TEXTURE_2D, tex1);
     qgl->glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
@@ -136,8 +138,8 @@ void glmodule::loadModule(int &num)
         qgl->glBindTexture(GL_TEXTURE_2D, tex1);
         qgl->glCompressedTexImage2D(GL_TEXTURE_2D, 0, GL_COMPRESSED_RG_RGTC2, tex_w/2, tex_h/2, 0, chromasize, sprbindata.data()+chromapos);
     }
-    else
-        qgl->glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, tex_w, tex_h, 0, GL_RGBA, GL_UNSIGNED_BYTE, sprbindata.data()+lumapos);
+	else
+		qgl->glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, tex_w, tex_h, 0, GL_RGBA, GL_UNSIGNED_BYTE, sprbindata.data()+lumapos);
 
     repaint();
 }
