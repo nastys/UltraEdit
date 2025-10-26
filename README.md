@@ -1,4 +1,6 @@
-# UltraEdit
+# Archived due to a number of issues, especially if you don't already have save data from a PS3 with at least one edit already included.
+
+## UltraEdit
 Edit converter for 初音ミク: Project DIVA
 
 ## Features:
